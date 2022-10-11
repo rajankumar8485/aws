@@ -5,12 +5,12 @@ variable "stack_name" {
 
 variable "lambda_handler" {
   type    = string
-  default = ""
+  default = "lambda_handler"
 }
 
 variable "lambda_runtime" {
   type    = string
-  default = ""
+  default = "python3.8"
 }
 
 variable "event_rule_description" {
