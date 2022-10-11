@@ -1,15 +1,20 @@
 resource "aws_lambda_function" "this" {
   filename         = file("${path.module}/artifacts/lambda.zip")
-  function_name    = var.lambda_name
+  function_name    = "${var.stack_name}_lambda"
   role             = aws_iam_role.this.arn
   handler          = var.lambda_handler
   runtime          = var.lambda_runtime
   source_code_hash = filebase64sha256("${file("${path.module}/artifacts/lambda.zip")}")
+
+  tags = {
+    Name = var.tags
+  }
+
 }
 
 resource "aws_cloudwatch_event_rule" "this" {
-  name                = var.event_rule_name
-  description         = var.event_rule_description
+  name                = "${var.stack_name}_lambda_event_rule"
+  description         = "${var.stack_name}-${var.event_rule_description}"
   schedule_expression = "rate(8 hours)"
 }
 

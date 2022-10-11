@@ -1,16 +1,52 @@
 resource "aws_iam_role" "this" {
-  name               = var.lambda_role_name
-  assume_role_policy = "${file("${path.module}/policies/lambda_sts_policy.json")}"
+  name               = "${var.stack_name}_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda-sts_policy.json
+  tags = {
+    Name = var.tags
+  }
 }
 
-resource "aws_iam_policy" "this" {
-  name = var.lambda_policy_name
-  path = "/"
-
-  policy = "${file("${path.module}/policies/lambda_policy.json")}"
+resource "aws_iam_role_policy" "this" {
+  name   = "${var.stack_name}_lambda_policy"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.lambda_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "this" {
-  role       = aws_iam_role.this.name
-  policy_arn = aws_iam_policy.this.arn
+data "aws_iam_policy_document" "lambda_policy" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup"
+    ]
+    effect = "Allow"
+    resources = "arn:aws:logs:${var.aws_region}:${var.account_id}:*"
+  }
+
+  # CloudwatchLogsFullAccess
+  statement {
+
+    actions = [
+      "logs:PutLogEvents",
+      "logs:CreateLogStream"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:logs:${var.aws_region}:${var.account_id}:log-group:/aws/lambda/ScheduleBatchTriggerStaging:*"
+    ]
+
+  }
+  
+}
+
+data "aws_iam_policy_document" "lambda-sts_policy" {
+  version = "2012-10-17"
+  statement {
+    sid     = ""
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
 }

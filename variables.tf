@@ -1,4 +1,4 @@
-variable "lambda_name" {
+variable "stack_name" {
   type    = string
   default = ""
 }
@@ -13,22 +13,22 @@ variable "lambda_runtime" {
   default = ""
 }
 
-variable "event_rule_name" {
-  type    = string
-  default = ""
-}
-
 variable "event_rule_description" {
   type    = string
-  default = ""
+  default = "Event rule"
 }
 
-variable "lambda_role_name" {
+variable "aws_region" {
   type    = string
   default = ""
 }
 
-variable "lambda_policy_name" {
+variable "account_id" {
+  type    = number
+  default = ""
+}
+
+variable "tags" {
   type    = string
   default = ""
 }
