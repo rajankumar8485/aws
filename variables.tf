@@ -15,7 +15,7 @@ variable "lambda_runtime" {
 
 variable "event_rule_description" {
   type    = string
-  default = "Event rule"
+  default = "event_rule"
 }
 
 variable "aws_region" {
