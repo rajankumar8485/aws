@@ -1,7 +1,20 @@
+terraform {}
+
+provider "aws" {
+  region  = "us-east-1"
+  profile = "default"
+}
+
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
+
+data "aws_caller_identity" "current" {}
+
 resource "aws_iam_role" "lambda_role" {
   name               = "${var.stack_name}_lambda_role"
   assume_role_policy = data.aws_iam_policy_document.lambda-sts_policy.json
-  tags = var.tags
+  tags               = var.tags
 }
 
 resource "aws_iam_role_policy" "lambda_role_policy" {
@@ -16,10 +29,12 @@ data "aws_iam_policy_document" "lambda_policy" {
       "logs:CreateLogGroup"
     ]
     effect = "Allow"
-    resources = "arn:aws:logs:${var.aws_region}:${var.account_id}:*"
+    resources = [
+      "arn:aws:logs:${var.aws_region}:${local.account_id}:*"
+    ]
   }
 
-# CloudwatchLogsAccess
+  # CloudwatchLogsAccess
   statement {
 
     actions = [
@@ -28,11 +43,11 @@ data "aws_iam_policy_document" "lambda_policy" {
     ]
     effect = "Allow"
     resources = [
-      "arn:aws:logs:${var.aws_region}:${var.account_id}:log-group:/aws/lambda/ScheduleBatchTriggerStaging:*"
+      "arn:aws:logs:${var.aws_region}:${local.account_id}:log-group:/aws/lambda/ScheduleBatchTriggerStaging:*"
     ]
 
   }
-  
+
 }
 
 data "aws_iam_policy_document" "lambda-sts_policy" {
