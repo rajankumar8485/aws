@@ -9,4 +9,10 @@ peering_map = [
     }
 ]
 
-for_each = for key in local.peering_map : key.cidr_name => key
+for_each = {for key in local.peering_map : key.cidr_name => key}
+
+variable "peering_map" {
+  type = list(map(string))
+  description = "map for peering connections"
+  default = []
+}
