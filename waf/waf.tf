@@ -14,9 +14,17 @@ resource "aws_wafv2_web_acl" "this" {
        priority = lookup(rule.value, "priority")
        
        override_action {
-        count {}
-       }
-       
+          dynamic "none" {
+            for_each = lookup(rule.value, "override_action", {}) == "none" ? [1] : []
+            content {}
+          }
+
+          dynamic "count" {
+            for_each = lookup(rule.value, "override_action", {}) == "count" ? [1] : []
+            content {}
+          }
+        }
+
        dynamic "action" {
         for_each = lookup(rule.value, "action", null) == null ? [] : [lookup(rule.value, "action")]
         content {
