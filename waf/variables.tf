@@ -3,6 +3,11 @@ variable "stack_name" {
   default = "test"
 }
 
+variable "aws_resource_arn" {
+  type    = string
+  default = ""
+}
+
 variable "rules" {
   type    = any
   default = []
@@ -11,12 +16,5 @@ variable "rules" {
 variable "tags" {
   type        = map(string)
   description = "A map of tags to apply to resources."
-  default     = {}
-}
-
-variable "waf_visibility_config" {
-  description = "visibility config rule"
-
-  type        = map(string)
   default     = {}
 }

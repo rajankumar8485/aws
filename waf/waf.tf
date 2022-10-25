@@ -1,9 +1,3 @@
-terraform {}
-
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_wafv2_web_acl" "this" {
   name        = "${var.stack_name}_web_acl"
   description = "Web acl"
@@ -12,15 +6,6 @@ resource "aws_wafv2_web_acl" "this" {
   default_action {
     allow {}
   }
-  
-  # dynamic "visibility_config" {
-  #   for_each = [var.waf_visibility_config]
-  #   content {
-  #       cloudwatch_metrics_enabled = lookup(visibility_config.value, "cloudwatch_metrics_enabled", true)
-  #       metric_name                = lookup(visibility_config.value, "metric_name", "${var.stack_name}-default-web-acl-metric-name")
-  #       sampled_requests_enabled   = lookup(visibility_config.value, "sampled_requests_enabled", true)
-  #   }
-  # }
 
   dynamic "rule" {
     for_each = var.rules
@@ -75,7 +60,6 @@ resource "aws_wafv2_web_acl" "this" {
       }
     
     }
-  
 
   }
 
@@ -83,14 +67,16 @@ resource "aws_wafv2_web_acl" "this" {
 
   visibility_config {
     cloudwatch_metrics_enabled = false
-    metric_name                = "${var.stack_name}-default-web-acl-metric-name"
+    metric_name                = "${var.stack_name}-default-web-acl-metric"
     sampled_requests_enabled   = false
   }
 }
 
-# resource "aws_wafv2_web_acl_association" "this" {
+resource "aws_wafv2_web_acl_association" "this" {
 
-#   resource_arn = var.api_gateway_arn
-#   web_acl_arn  = aws_wafv2_web_acl.this.arn
+  count = var.waf_association_create ? 1 : 0
 
-# }
+  resource_arn = var.aws_resource_arn
+  web_acl_arn  = aws_wafv2_web_acl.this.arn
+
+}
