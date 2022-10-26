@@ -13,17 +13,20 @@ resource "aws_wafv2_web_acl" "this" {
        name     = lookup(rule.value, "name")
        priority = lookup(rule.value, "priority")
        
-       override_action {
+       dynamic "override_action" {
+        for_each = lookup(rule.value, "override_action", null) == null ? [] : [1]
+        content {
           dynamic "none" {
-            for_each = lookup(rule.value, "override_action", {}) == "none" ? [1] : []
+            for_each = lower(lookup(rule.value, "override_action", null)) == "none" ? [1] : []
             content {}
           }
 
           dynamic "count" {
-            for_each = lookup(rule.value, "override_action", {}) == "count" ? [1] : []
+            for_each = lower(lookup(rule.value, "override_action", null)) == "count" ? [1] : []
             content {}
           }
         }
+       }
 
        dynamic "action" {
         for_each = lookup(rule.value, "action", null) == null ? [] : [lookup(rule.value, "action")]
@@ -77,13 +80,19 @@ resource "aws_wafv2_web_acl" "this" {
 
   tags = var.tags
 
-  dynamic "visibility_config" {
-    for_each = length(var.waf_visibility_config) == 0 ? [] : [var.waf_visibility_config]
-    content {
-      cloudwatch_metrics_enabled = lookup(visibility_config.value, "cloudwatch_metrics_enabled", true)
-      metric_name                = lookup(visibility_config.value, "metric_name", "${var.stack_name}-default-web-acl-metric-name")
-      sampled_requests_enabled   = lookup(visibility_config.value, "sampled_requests_enabled", true)
-    }
+  # dynamic "visibility_config" {
+  #   for_each = length(var.waf_visibility_config) == 0 ? [] : [var.waf_visibility_config]
+  #   content {
+  #     cloudwatch_metrics_enabled = lookup(visibility_config.value, "cloudwatch_metrics_enabled", true)
+  #     metric_name                = lookup(visibility_config.value, "metric_name", "${var.stack_name}-default-web-acl-metric-name")
+  #     sampled_requests_enabled   = lookup(visibility_config.value, "sampled_requests_enabled", true)
+  #   }
+  # }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${var.stack_name}-default-web-acl-metric-name"
+    sampled_requests_enabled   = true
   }
 }
 

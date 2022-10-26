@@ -19,8 +19,8 @@ variable "tags" {
   default     = {}
 }
 
-variable "waf_visibility_config" {
-  description = "waf visibility config rules"
-  type        = map(string)
-  default     = {}
-}
+# variable "waf_visibility_config" {
+#   description = "waf visibility config rules"
+#   type        = map(string)
+#   default     = {}
+# }
