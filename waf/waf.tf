@@ -28,25 +28,25 @@ resource "aws_wafv2_web_acl" "this" {
         }
        }
 
-       dynamic "action" {
-        for_each = lookup(rule.value, "action", null) == null ? [] : [lookup(rule.value, "action")]
-        content {
-          dynamic "allow" {
-            for_each = lower(action.value) == "allow" ? [1] : []
-            content {}
-          }
+      #  dynamic "action" {
+      #   for_each = lookup(rule.value, "action", null) == null ? [] : [lookup(rule.value, "action")]
+      #   content {
+      #     dynamic "allow" {
+      #       for_each = lower(action.value) == "allow" ? [1] : []
+      #       content {}
+      #     }
 
-          dynamic "block" {
-            for_each = lower(action.value) == "block" ? [1] : []
-            content {}
-          }
+      #     dynamic "block" {
+      #       for_each = lower(action.value) == "block" ? [1] : []
+      #       content {}
+      #     }
 
-          dynamic "count" {
-            for_each = lower(action.value) == "count" ? [1] : []
-            content {}
-          }
-        }
-      }
+      #     dynamic "count" {
+      #       for_each = lower(action.value) == "count" ? [1] : []
+      #       content {}
+      #     }
+      #   }
+      # }
 
       statement {
         dynamic "managed_rule_group_statement" {
