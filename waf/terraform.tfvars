@@ -1,6 +1,6 @@
 rules = [
     {
-      name            = "ManagedRule01"
+      name            = "AWS-AWSManagedRulesCommonRuleSet"
       priority        = 0
       override_action = "none"
       visibility_config = {
@@ -16,7 +16,7 @@ rules = [
       }
     },
     {
-      name            = "ManagedRule02"
+      name            = "AWS-AWSManagedRulesSQLiRuleSet"
       priority        = 1
       override_action = "none"
       action          = "allow"
@@ -26,7 +26,7 @@ rules = [
       }
     },
     {
-      name            = "ManagedRule03"
+      name            = "AWS-AWSManagedRulesAmazonIpReputationList"
       priority        = 2
       override_action = "none"
       action          = "allow"
@@ -36,7 +36,7 @@ rules = [
       }
     },
     {
-      name            = "ManagedRule04"
+      name            = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
       priority        = 3
       override_action = "none"
       action          = "allow"
