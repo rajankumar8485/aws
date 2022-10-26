@@ -3,10 +3,10 @@ variable "stack_name" {
   default = "test"
 }
 
-variable "aws_resource_arn" {
-  type    = string
-  default = ""
-}
+# variable "aws_resource_arn" {
+#   type    = string
+#   default = ""
+# }
 
 variable "rules" {
   type    = any
@@ -19,8 +19,14 @@ variable "tags" {
   default     = {}
 }
 
-# variable "waf_visibility_config" {
-#   description = "waf visibility config rules"
-#   type        = map(string)
-#   default     = {}
-# }
+variable "waf_type" {
+  type        = list(string)
+  description = "list of waf resource types."
+  default     = ["public-api","device"]
+}
+
+variable "waf_association_map" {
+  type        = list(map(string))
+  description = "Map of waf association."
+  default     = []
+}

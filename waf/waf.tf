@@ -1,5 +1,7 @@
 resource "aws_wafv2_web_acl" "this" {
-  name        = "${var.stack_name}_web_acl"
+  for_each    = toset(var.waf_type)
+
+  name        = "${var.stack_name}-${each.key}-web-acl"
   description = "Web acl"
   scope       = "REGIONAL"
 
@@ -27,26 +29,6 @@ resource "aws_wafv2_web_acl" "this" {
           }
         }
        }
-
-      #  dynamic "action" {
-      #   for_each = lookup(rule.value, "action", null) == null ? [] : [lookup(rule.value, "action")]
-      #   content {
-      #     dynamic "allow" {
-      #       for_each = lower(action.value) == "allow" ? [1] : []
-      #       content {}
-      #     }
-
-      #     dynamic "block" {
-      #       for_each = lower(action.value) == "block" ? [1] : []
-      #       content {}
-      #     }
-
-      #     dynamic "count" {
-      #       for_each = lower(action.value) == "count" ? [1] : []
-      #       content {}
-      #     }
-      #   }
-      # }
 
       statement {
         dynamic "managed_rule_group_statement" {
@@ -80,15 +62,6 @@ resource "aws_wafv2_web_acl" "this" {
 
   tags = var.tags
 
-  # dynamic "visibility_config" {
-  #   for_each = length(var.waf_visibility_config) == 0 ? [] : [var.waf_visibility_config]
-  #   content {
-  #     cloudwatch_metrics_enabled = lookup(visibility_config.value, "cloudwatch_metrics_enabled", true)
-  #     metric_name                = lookup(visibility_config.value, "metric_name", "${var.stack_name}-default-web-acl-metric-name")
-  #     sampled_requests_enabled   = lookup(visibility_config.value, "sampled_requests_enabled", true)
-  #   }
-  # }
-
   visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "${var.stack_name}-default-web-acl-metric-name"
@@ -96,11 +69,11 @@ resource "aws_wafv2_web_acl" "this" {
   }
 }
 
-resource "aws_wafv2_web_acl_association" "this" {
+# resource "aws_wafv2_web_acl_association" "this" {
 
-  count = var.waf_association_create ? 1 : 0
+#   for_each = var.waf_association_map
 
-  resource_arn = var.aws_resource_arn
-  web_acl_arn  = aws_wafv2_web_acl.this.arn
+#   resource_arn = each.value.resource_arn
+#   web_acl_arn  = aws_wafv2_web_acl.this[each.value.type].arn
 
-}
+# }
