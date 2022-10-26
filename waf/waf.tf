@@ -77,10 +77,13 @@ resource "aws_wafv2_web_acl" "this" {
 
   tags = var.tags
 
-  visibility_config {
-    cloudwatch_metrics_enabled = false
-    metric_name                = "${var.stack_name}-default-web-acl-metric"
-    sampled_requests_enabled   = false
+  dynamic "visibility_config" {
+    for_each = length(var.waf_visibility_config) == 0 ? [] : [var.waf_visibility_config]
+    content {
+      cloudwatch_metrics_enabled = lookup(visibility_config.value, "cloudwatch_metrics_enabled", true)
+      metric_name                = lookup(visibility_config.value, "metric_name", "${var.stack_name}-default-web-acl-metric-name")
+      sampled_requests_enabled   = lookup(visibility_config.value, "sampled_requests_enabled", true)
+    }
   }
 }
 
