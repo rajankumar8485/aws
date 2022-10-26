@@ -61,3 +61,14 @@ rules = [
       }
     }
 ]
+
+waf_association_map = [
+  {
+    resource_arn = "api_gateway_arn"
+    type         = "device"
+  },
+  {
+    resource_arn = "load_balancer_arn"
+    type         = "public-api"
+  }
+]

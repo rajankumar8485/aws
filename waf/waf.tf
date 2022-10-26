@@ -71,7 +71,7 @@ resource "aws_wafv2_web_acl" "this" {
 
 resource "aws_wafv2_web_acl_association" "this" {
 
-  for_each = var.waf_association_create ? var.waf_association_map : []
+  for_each = var.waf_association_map
 
   resource_arn = each.value.resource_arn
   web_acl_arn  = aws_wafv2_web_acl.this[each.value.type].arn
