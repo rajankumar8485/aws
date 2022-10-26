@@ -30,3 +30,8 @@ variable "waf_association_map" {
   description = "Map of waf association."
   default     = []
 }
+
+variable "waf_association_create" {
+  type    = bool
+  default = false
+}
