@@ -1,0 +1,67 @@
+locals {
+  output_path       = "${path.module}/output"
+  lambda_fn_path    = "${local.output_path}/${var.name}-rotation-function"
+  lambda_fn_archive = "${local.output_path}/${var.name}-rotation-function.zip"
+
+  handler_file_parts = regex("(?P<file_name>\\w+)\\.[a-z]{2}$", var.handler_file_name)
+}
+
+#tfsec:ignore:aws-cloudwatch-log-group-customer-key
+resource aws_cloudwatch_log_group lambda_log_group {
+  name              = "/aws/lambda/${var.name}"
+  retention_in_days = var.log_retention_period
+}
+
+data archive_file archived_function {
+  type             = "zip"
+  output_path      = local.lambda_fn_archive
+  output_file_mode = "0666"
+
+  source {
+    content  = var.handler_file_content
+    filename = var.handler_file_name
+  }
+}
+
+#tfsec:ignore:aws-lambda-enable-tracing
+resource aws_lambda_function lambda_function {
+  function_name    = var.name
+  role             = aws_iam_role.execution_role.arn
+  filename         = local.lambda_fn_archive
+  source_code_hash = data.archive_file.archived_function.output_base64sha256
+  handler          = "${local.handler_file_parts.file_name}.${var.handler_function_name}"
+  runtime          = var.runtime
+  timeout          = var.timeout
+
+  dynamic "environment" {
+    for_each = var.environment_variables != null ? [1] : []
+    content {
+      variables = var.environment_variables
+    }
+  }
+}
+
+### Scheduled Triggering ###
+
+resource aws_cloudwatch_event_rule event_rule {
+  count               = var.schedule_expression != "" ? 1 : 0
+  name                = "${var.name}-lambda-event-rule"
+  schedule_expression = var.schedule_expression
+}
+
+resource aws_cloudwatch_event_target event_target {
+  count = var.schedule_expression != "" ? 1 : 0
+  arn   = aws_lambda_function.lambda_function.arn
+  rule  = aws_cloudwatch_event_rule.event_rule[0].name
+}
+
+resource aws_lambda_permission lambda_permission {
+  count         = var.schedule_expression != "" ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.event_rule[0].arn
+}
+
+### end Scheduled Triggering ###
