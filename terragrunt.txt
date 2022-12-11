@@ -1,0 +1,84 @@
+inputs = {
+  stack_name = ""
+  lambda_handler = "lambda_function.lambda_handler"
+  lambda_runtime = "python3.9"
+  event_rule_description = "cronjob lambda"
+  aws_region = "us-east-1"
+  schedule_expression = ""
+  log_group_retention_in_days = 15
+  
+  handler_file_content = <<EOF
+    (Your code goes here)
+  EOF
+
+  handler_file_name = cronjob_lambda
+  timeout = 30
+  environment_variables = {
+    hostname = lookup(dependency.apigw.outputs.stages, "invoke_url")
+  }
+  subnet_ids = ["subnet1","subnet2"]
+  vpc_id = "vpc123"
+
+  egress_sg_rules = [
+    {
+      description = "rule1"
+      from_port = 80
+      to_port = 80
+      protocol = "tcp"
+      security_groups = []
+    },
+    {
+      description = "rule2"
+      from_port = 5671
+      to_port = 5671
+      protocol = "tcp"
+      security_groups = []
+    },
+    {
+      description = "rule3"
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      security_groups = []
+    },
+    {
+      description = "rule4"
+      from_port = 443
+      to_port = 443
+      protocol = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      description = "rule5"
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ]
+
+  ingress_sg_rules = [
+    {
+      description = "rule1"
+      from_port = 80
+      to_port = 80
+      protocol = "tcp"
+      security_groups = []
+    },
+    {
+      description = "rule2"
+      from_port = 80
+      to_port = 80
+      protocol = "tcp"
+      cidr_blocks = []
+    },
+    {
+      description = "rule3"
+      from_port = 0
+      to_port = 0
+      protocol = "-1"
+      security_groups = []
+    }
+  ]
+
+}
