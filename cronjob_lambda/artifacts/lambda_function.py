@@ -1,6 +1,8 @@
 import urllib3
+import os
+apigw_hostname = os.environ['hostname']
+url="https://"+apigw_hostname+"/api/b2b/batch/trigger"
 def lambda_handler(event, context):
     http = urllib3.PoolManager()
-    r = http.request('GET', 'https://11v3yvpa10.execute-api.us-east-1.amazonaws.com/api/b2b/batch/trigger')
+    r = http.request('GET', url)
     r.status
-    # 200
